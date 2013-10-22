@@ -1,15 +1,12 @@
 package ru.tyurin.seausb.ui;
 
 
+import ru.tyurin.seausb.Controller;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
 
 public class SeaUI extends JFrame {
 
@@ -18,73 +15,44 @@ public class SeaUI extends JFrame {
 	private static final int WINDOW_WIDHT = 300;
 	private static final int WINDOW_HEIGHT = 200;
 
+	private Controller controller;
 
-	public SeaUI() throws HeadlessException {
+	private SeaPanel panel;
+
+
+	public SeaUI(Controller controller) throws Exception {
 		super(TITLE);
+		this.controller = controller;
+		this.panel = new SeaPanel(controller);
 		setResizable(false);
 		setSize(WINDOW_WIDHT, WINDOW_HEIGHT);
 		setLocationRelativeTo(null);
 		createTray();
 		setUndecorated(true);
-		setContentPane(new SeaPanel());
+		setContentPane(this.panel);
 		setVisible(true);
 	}
 
-	private void createTray() {
+	public SeaPanel getPanel() {
+		return panel;
+	}
+
+	private void createTray() throws Exception {
 		if (SystemTray.isSupported()) {
 			SystemTray tray = SystemTray.getSystemTray();
-			URL iconUrl = getClass().getResource(TRAY_ICON_PATH);
-			Image img = Toolkit.getDefaultToolkit().getImage(iconUrl);
+			Image img = Toolkit.getDefaultToolkit().getImage(getClass().getResource(TRAY_ICON_PATH));
 
-			final JPopupMenu popup = new JPopupMenu();
-			JMenuItem exitItem = new JMenuItem("Exit");
-			exitItem.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-//					UIController.getInstance().exit();
-				}
-			});
-			popup.add(exitItem);
-			JMenuItem openUIItem = new JMenuItem("Show Status");
-			openUIItem.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					setVisible(true);
-				}
-			});
-
-
-			final TrayIcon icon = new TrayIcon(img, "FileSync");
+			final TrayIcon icon = new TrayIcon(img, "Sync your USB with SEA-USB! :)");
 			icon.setImageAutoSize(true);
 			icon.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					try {
-						Desktop.getDesktop().open(new File(""));//todo
-					} catch (IOException e1) {
-						e1.printStackTrace();
-					}
+					controller.showWindow();
 				}
 			});
-			icon.addMouseListener(new MouseAdapter() {
-				@Override
-				public void mouseReleased(MouseEvent e) {
-					if (e.getButton() == MouseEvent.BUTTON3) {
-						popup.setLocation(e.getX(), e.getY());
-						popup.setInvoker(popup);
-						popup.setVisible(true);
-					}
-				}
-			});
-
-
-			try {
-				tray.add(icon);
-			} catch (AWTException e) {
-				e.printStackTrace();
-			}
+			tray.add(icon);
 		} else {
-			System.out.println("Tray is not supported");
+			throw new Exception("Tray not supported");
 		}
 	}
 }

@@ -1,12 +1,13 @@
 package ru.tyurin.seausb;
 
 
-import ru.tyurin.seausb.ui.SeaUI;
-
 public class Sea {
 
-
-	public static void main(String[] args) {
-		SeaUI ui = new SeaUI();
+	//todo error handler
+	public static void main(String[] args) throws Exception {
+		Model model = new Model();
+		Controller controller = new Controller(model);
+		View view = new View(controller);
+		controller.setView(view);
 	}
 }
