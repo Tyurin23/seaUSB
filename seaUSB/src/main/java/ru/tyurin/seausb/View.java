@@ -25,7 +25,8 @@ public class View {
 	public void refreshTask(Task task) {
 		TaskListPanel taskList = ui.getPanel().getTaskListPanel();
 		TaskPanel panel = taskList.getTaskPanel(task.getId());
-
+		panel.setFlashLabelText((task.getFlash() != null ? task.getFlash().toString() : ""));
+		panel.setDiscLabelText(task.getDisk() != null ? task.getDisk().toString() : "");
 	}
 
 	public void hide() {

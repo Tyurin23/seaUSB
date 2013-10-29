@@ -2,6 +2,8 @@ package ru.tyurin.seausb.ui;
 
 
 import ru.tyurin.seausb.Controller;
+import ru.tyurin.seausb.util.USBDrive;
+import ru.tyurin.seausb.util.USBTool;
 
 import javax.swing.*;
 import java.awt.*;
@@ -99,6 +101,21 @@ public class TaskPanel extends JPanel {
 		return id;
 	}
 
+	public void setDiscLabelText(String text) {
+		if (text.length() > 30) {
+			text = text.substring(0, 30);
+		}
+		diskLabel.setText(text);
+	}
+
+	public void setFlashLabelText(String text) {
+		flashLabel.setText(text);
+	}
+
+	public void notInitView() {
+		setBackground(Color.RED);
+	}
+
 	private JFileChooser createFileChooser() {
 		JFileChooser fileChooser = new JFileChooser();
 		fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -115,7 +132,7 @@ public class TaskPanel extends JPanel {
 				int result = fileChooser.showDialog(null, "OK");
 				if (result == JFileChooser.APPROVE_OPTION) {
 					File file = fileChooser.getSelectedFile();
-					controller.addDirectory(id, file);
+					controller.addDirectory(id, file.toPath());
 				}
 			}
 		});
@@ -125,19 +142,45 @@ public class TaskPanel extends JPanel {
 
 	private JButton addFlashButton() {
 		Image img = Toolkit.getDefaultToolkit().getImage(getClass().getResource(FLASH_IMAGE)).getScaledInstance(16, 16, Image.SCALE_SMOOTH);
-		JButton button = createButton(img);
+		final JButton button = createButton(img);
 		button.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				JPopupMenu menu = getFlashChooseMenu(button);
+				for (final USBDrive drive : USBTool.usbList()) {
+					JMenuItem item = new JMenuItem(drive.getName());
+					item.addActionListener(new ActionListener() {
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							controller.addFlashDirectory(getId(), drive.getPath());
+						}
+					});
+					menu.add(item);
+				}
+				menu.show(button, button.getWidth(), button.getHeight());
+			}
+		});
+		add(button, FLASH_IMAGE_CONSTRAINTS);
+		return button;
+	}
+
+	private JPopupMenu getFlashChooseMenu(Component invoker) {
+		JPopupMenu usbChooseMenu = new JPopupMenu();
+		JMenuItem other = new JMenuItem("Other...");
+		other.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				int result = fileChooser.showDialog(null, "OK");
 				if (result == JFileChooser.APPROVE_OPTION) {
 					File file = fileChooser.getSelectedFile();
-					flashLabel.setText(file.getName());
+					controller.addFlashDirectory(getId(), file.toPath());
 				}
 			}
 		});
-		add(button, FLASH_IMAGE_CONSTRAINTS);
-		return button;
+		usbChooseMenu.add(other);
+		usbChooseMenu.addSeparator();
+		usbChooseMenu.setInvoker(invoker);
+		return usbChooseMenu;
 	}
 
 	private JLabel addDiskLabel() {
@@ -161,7 +204,12 @@ public class TaskPanel extends JPanel {
 	private JButton addSyncButton() {
 		Image img = Toolkit.getDefaultToolkit().getImage(getClass().getResource(SYNC_IMAGE)).getScaledInstance(16, 16, Image.SCALE_SMOOTH);
 		JButton button = createButton(img);
-
+		button.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				controller.sync(getId());
+			}
+		});
 		add(button, SYNC_BUTTON_CONSTRAINTS);
 		return button;
 	}
