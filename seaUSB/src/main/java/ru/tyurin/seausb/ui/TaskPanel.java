@@ -132,7 +132,7 @@ public class TaskPanel extends JPanel {
 				int result = fileChooser.showDialog(null, "OK");
 				if (result == JFileChooser.APPROVE_OPTION) {
 					File file = fileChooser.getSelectedFile();
-					controller.addDirectory(id, file.toPath());
+					controller.addDestinationDirectory(id, file.toPath());
 				}
 			}
 		});
@@ -152,7 +152,7 @@ public class TaskPanel extends JPanel {
 					item.addActionListener(new ActionListener() {
 						@Override
 						public void actionPerformed(ActionEvent e) {
-							controller.addFlashDirectory(getId(), drive.getPath());
+							controller.addSourceDirectory(getId(), drive.getPath());
 						}
 					});
 					menu.add(item);
@@ -173,7 +173,7 @@ public class TaskPanel extends JPanel {
 				int result = fileChooser.showDialog(null, "OK");
 				if (result == JFileChooser.APPROVE_OPTION) {
 					File file = fileChooser.getSelectedFile();
-					controller.addFlashDirectory(getId(), file.toPath());
+					controller.addSourceDirectory(getId(), file.toPath());
 				}
 			}
 		});
