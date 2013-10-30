@@ -1,6 +1,7 @@
 package ru.tyurin.seausb;
 
 
+import ru.tyurin.seausb.sync.Storage;
 import ru.tyurin.seausb.sync.Synchronizer;
 import ru.tyurin.seausb.sync.Task;
 
@@ -28,45 +29,46 @@ public class Controller {
 		this.view = view;
 	}
 
-	public void addDirectory(Long id, Path dir) {
+	public void addDestinationDirectory(Long id, Path dst) {
 		if (id == null) {
 			throw new NullPointerException("Task ID is null");
 		}
-		if (dir == null) {
+		if (dst == null) {
 			throw new NullPointerException("Directory is null");
 		}
-		if (!Files.isDirectory(dir)) {
-			throw new IllegalArgumentException(dir + " is not directory");
+		if (!Files.isDirectory(dst)) {
+			throw new IllegalArgumentException(dst + " is not directory");
 		}
-		if (!Files.isWritable(dir)) {
-			throw new IllegalArgumentException(dir + " is not writable");
+		if (!Files.isWritable(dst)) {
+			throw new IllegalArgumentException(dst + " is not writable");
 		}
 		Task task = model.getTask(id);
 		if (task == null) {
 			throw new IllegalArgumentException("Task with id " + id + " not found");
 		}
-		task.setDisk(dir);
+		Storage storage = new Storage(dst);
+		task.setDst(storage);
 		view.refreshTask(task);
 	}
 
-	public void addFlashDirectory(Long id, Path flash) {
+	public void addSourceDirectory(Long id, Path src) {
 		if (id == null) {
 			throw new NullPointerException("Task ID is null");
 		}
-		if (flash == null) {
+		if (src == null) {
 			throw new NullPointerException("Directory is null");
 		}
-		if (!Files.isDirectory(flash)) {
-			throw new IllegalArgumentException(flash + " is not directory");
+		if (!Files.isDirectory(src)) {
+			throw new IllegalArgumentException(src + " is not directory");
 		}
-		if (!Files.isDirectory(flash)) {
-			throw new IllegalArgumentException(flash + " is not writable");
+		if (!Files.isDirectory(src)) {
+			throw new IllegalArgumentException(src + " is not writable");
 		}
 		Task task = model.getTask(id);
 		if (task == null) {
 			throw new IllegalArgumentException("Task with id " + id + " not found");
 		}
-		task.setFlash(flash);
+		task.setSrc(new Storage(src));
 		view.refreshTask(task);
 	}
 

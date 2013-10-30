@@ -1,14 +1,12 @@
 package ru.tyurin.seausb.sync;
 
 
-import java.nio.file.Path;
-
 public class Task {
 
 	private Long id;
 	private TaskStatus status;
-	private Path flash;
-	private Path disk;
+	private Storage src;
+	private Storage dst;
 
 	public Task(Long id) {
 		this.id = id;
@@ -19,20 +17,20 @@ public class Task {
 		return id;
 	}
 
-	public Path getDisk() {
-		return disk;
+	public Storage getSrc() {
+		return src;
 	}
 
-	public void setDisk(Path disk) {
-		this.disk = disk;
+	public void setSrc(Storage src) {
+		this.src = src;
 	}
 
-	public Path getFlash() {
-		return flash;
+	public Storage getDst() {
+		return dst;
 	}
 
-	public void setFlash(Path flash) {
-		this.flash = flash;
+	public void setDst(Storage dst) {
+		this.dst = dst;
 	}
 
 	public TaskStatus getStatus() {
