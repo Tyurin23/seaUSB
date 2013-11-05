@@ -9,13 +9,17 @@ import java.awt.event.FocusEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 
-public class ComponentPresenter<E extends JComponent> implements Presenter<E> {
+public abstract class ComponentPresenter<E extends JComponent> implements Presenter<E> {
 
 	protected E component;
 
 	@Override
 	public void setComponent(E component) {
 		this.component = Preconditions.checkNotNull(component, "Component is null");
+		init();
+	}
+
+	protected void init() {
 	}
 
 	@Override
