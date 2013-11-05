@@ -10,8 +10,6 @@ import ru.tyurin.filecreator.FilesTreeCreator;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import static org.testng.Assert.assertTrue;
-
 public class SynchronizerTest {
 
 	final Path src = Paths.get("/home/tyurin/tmp/drive");
@@ -38,9 +36,7 @@ public class SynchronizerTest {
 		Task task = new Task(1L);
 
 
-		Synchronizer synchronizer = new Synchronizer();
-		boolean result = synchronizer.synchronize(task);
-		assertTrue(result);
+		Synchronizer synchronizer = new Synchronizer(task);
 
 	}
 }
