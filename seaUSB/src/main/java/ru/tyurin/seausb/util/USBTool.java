@@ -24,6 +24,15 @@ public class USBTool {
 		return null;
 	}
 
+	public static USBDrive find(String name) {
+		for (USBDrive drive : usbList()) {
+			if (drive.getName().equals(name)) {
+				return drive;
+			}
+		}
+		return null;
+	}
+
 	private static Collection<USBDrive> usbListLinux() {
 		List<USBDrive> drives = new ArrayList<>();
 		Path mountPath = Paths.get(LINUX_MOUNT_PATH);
