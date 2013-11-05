@@ -1,11 +1,7 @@
 package ru.tyurin.seausb.ui;
 
-import ru.tyurin.seausb.Controller;
-
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 public class SeaPanel extends JPanel {
 
@@ -62,48 +58,72 @@ public class SeaPanel extends JPanel {
 
 	private final GridBagConstraints LIST_CONSTRAINTS = new GridBagConstraints(
 			0, 1,
-			4, 1,
+			5, 1,
 			1, 0.8,
 			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 			new Insets(5, 5, 5, 5),
 			0, 0
 	);
 
-	private Controller controller;
+	private Presenter presenter;
 
 	private TaskListPanel taskListPanel;
+	private JButton closeButton;
+	private JButton hideButton;
+	private JButton menuButton;
+	private JButton removeButton;
+	private JButton addButton;
 
-	public SeaPanel(Controller controller) {
+	public SeaPanel(Presenter presenter) {
 		super(new GridBagLayout());
-		this.controller = controller;
+		this.presenter = presenter;
+		this.presenter.setComponent(this);
+
 		setBackground(Color.WHITE);
 		setBorder(BorderFactory.createLineBorder(Color.BLACK));
 		setFocusable(true);
-		addCloseButton();
-		addHideButton();
-		addMenuButton();
-		addRemoveButton();
-		addAddButton();
 
-		taskListPanel = addTaskListPanel();
+		closeButton = addCloseButton();
+		hideButton = addHideButton();
+		menuButton = addMenuButton();
+		menuButton.setEnabled(false);
+		removeButton = addRemoveButton();
+		removeButton.setEnabled(false);
+		addButton = addAddButton();
 	}
 
 	public TaskListPanel getTaskListPanel() {
 		return taskListPanel;
 	}
 
+	public void setTaskListPanel(TaskListPanel panel) {
+		this.taskListPanel = addTaskListPanel(panel);
+	}
+
+	public JButton getCloseButton() {
+		return closeButton;
+	}
+
+	public JButton getHideButton() {
+		return hideButton;
+	}
+
+	public JButton getRemoveButton() {
+		return removeButton;
+	}
+
+	public JButton getMenuButton() {
+		return menuButton;
+	}
+
+	public JButton getAddButton() {
+		return addButton;
+	}
+
 	private JButton addHideButton() {
 		Image icon = Toolkit.getDefaultToolkit().getImage(getClass().getResource(HIDE_ICON)).getScaledInstance(16, 16, Image.SCALE_SMOOTH);
 		final JButton hide = createButton(icon);
-
-		hide.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				controller.hideWindow();
-			}
-		});
-
-
+		hide.setActionCommand(SeaPanelPresenter.HIDE_WINDOW_COMMAND);
 		add(hide, HIDE_BUTTON_CONSTRAINTS);
 		return hide;
 	}
@@ -111,15 +131,7 @@ public class SeaPanel extends JPanel {
 	private JButton addCloseButton() {
 		Image icon = Toolkit.getDefaultToolkit().getImage(getClass().getResource(CLOSE_ICON)).getScaledInstance(16, 16, Image.SCALE_SMOOTH);
 		final JButton close = createButton(icon);
-
-		close.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				controller.exit();
-			}
-		});
-
-
+		close.setActionCommand(SeaPanelPresenter.EXIT_COMMAND);
 		add(close, CLOSE_BUTTON_CONSTRAINTS);
 		return close;
 	}
@@ -127,12 +139,7 @@ public class SeaPanel extends JPanel {
 	private JButton addMenuButton() {
 		Image icon = Toolkit.getDefaultToolkit().getImage(getClass().getResource(MENU_ICON)).getScaledInstance(16, 16, Image.SCALE_SMOOTH);
 		JButton menu = createButton(icon);
-		menu.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				controller.exit();
-			}
-		});
+
 		add(menu, MENU_BUTTON_CONSTRAINTS);
 		return menu;
 	}
@@ -140,6 +147,7 @@ public class SeaPanel extends JPanel {
 	private JButton addRemoveButton() {
 		Image icon = Toolkit.getDefaultToolkit().getImage(getClass().getResource(REMOVE_ICON)).getScaledInstance(16, 16, Image.SCALE_SMOOTH);
 		JButton remove = createButton(icon);
+		remove.setActionCommand(SeaPanelPresenter.REMOVE_TASK_COMMAND);
 		add(remove, REMOVE_BUTTON_CONSTRAINTS);
 		return remove;
 	}
@@ -147,12 +155,7 @@ public class SeaPanel extends JPanel {
 	private JButton addAddButton() {
 		Image icon = Toolkit.getDefaultToolkit().getImage(getClass().getResource(ADD_ICON)).getScaledInstance(16, 16, Image.SCALE_SMOOTH);
 		JButton add = createButton(icon);
-		add.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				controller.addTask();
-			}
-		});
+		add.setActionCommand(SeaPanelPresenter.ADD_TASK_COMMAND);
 		add(add, ADD_BUTTON_CONSTRAINTS);
 		return add;
 	}
@@ -162,11 +165,11 @@ public class SeaPanel extends JPanel {
 		button.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
 		button.setContentAreaFilled(false);
 		button.setFocusable(false);
+		button.addActionListener(presenter);
 		return button;
 	}
 
-	private TaskListPanel addTaskListPanel() {
-		TaskListPanel panel = new TaskListPanel(controller);
+	private TaskListPanel addTaskListPanel(TaskListPanel panel) {
 		JScrollPane scrollPane = panel.getScrollPane();
 		add(scrollPane, LIST_CONSTRAINTS);
 		return panel;

@@ -1,7 +1,5 @@
 package ru.tyurin.seausb.ui;
 
-import ru.tyurin.seausb.Controller;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
@@ -13,14 +11,16 @@ import java.util.Map;
 public class TaskListPanel extends JPanel {
 
 	Map<Long, TaskPanel> taskPanels;
-	private Controller controller;
 	private JScrollPane scrollPane;
+	private Presenter presenter;
 
-	public TaskListPanel(Controller controller) {
+	public TaskListPanel(Presenter presenter) {
+		this.presenter = presenter;
+		presenter.setComponent(this);
+
 		taskPanels = new HashMap<>();
 		BoxLayout layout = new BoxLayout(this, BoxLayout.Y_AXIS);
 
-		this.controller = controller;
 
 		setBackground(Color.WHITE);
 		setBorder(BorderFactory.createLineBorder(Color.BLACK));
@@ -41,18 +41,4 @@ public class TaskListPanel extends JPanel {
 		return scrollPane;
 	}
 
-	public void addTask(TaskPanel task) {
-		Dimension size = new Dimension(getWidth(), getHeight() / 3);
-		task.setSize(size);
-		task.setMaximumSize(size);
-		task.setMaximumSize(size);
-		add(task);
-		revalidate();
-		getScrollPane().revalidate();
-		taskPanels.put(task.getId(), task);
-	}
-
-	public TaskPanel getTaskPanel(Long id) {
-		return taskPanels.get(id);
-	}
 }

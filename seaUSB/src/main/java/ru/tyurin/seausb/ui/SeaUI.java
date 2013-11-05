@@ -1,12 +1,10 @@
 package ru.tyurin.seausb.ui;
 
 
-import ru.tyurin.seausb.Controller;
+import ru.tyurin.seausb.Model;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 public class SeaUI extends JFrame {
 
@@ -15,28 +13,31 @@ public class SeaUI extends JFrame {
 	private static final int WINDOW_WIDHT = 300;
 	private static final int WINDOW_HEIGHT = 200;
 
-	private Controller controller;
 
 	private SeaPanel panel;
+	private Model model;
 
 
-	public SeaUI(Controller controller) throws Exception {
+	public SeaUI() throws Exception {
 		super(TITLE);
-		this.controller = controller;
-		this.panel = new SeaPanel(controller);
+		model = new Model();
+		this.panel = addSeaPanel();
 		setResizable(false);
 		setSize(WINDOW_WIDHT, WINDOW_HEIGHT);
 		setLocationRelativeTo(null);
 		createTray();
 		setUndecorated(true);
-		setContentPane(this.panel);
 		setVisible(true);
 	}
 
-	public SeaPanel getPanel() {
+	private SeaPanel addSeaPanel() {
+		SeaPanelPresenter presenter = new SeaPanelPresenter(model);
+		SeaPanel panel = new SeaPanel(presenter);
+		setContentPane(panel);
 		return panel;
 	}
 
+	//todo if tray is not supported???
 	private void createTray() throws Exception {
 		if (SystemTray.isSupported()) {
 			SystemTray tray = SystemTray.getSystemTray();
@@ -44,12 +45,7 @@ public class SeaUI extends JFrame {
 
 			final TrayIcon icon = new TrayIcon(img, "Sync your USB with SEA-USB! :)");
 			icon.setImageAutoSize(true);
-			icon.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					controller.showWindow();
-				}
-			});
+			// todo show window
 			tray.add(icon);
 		} else {
 			throw new Exception("Tray not supported");
