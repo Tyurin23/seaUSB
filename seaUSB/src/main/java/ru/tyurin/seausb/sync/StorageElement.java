@@ -1,9 +1,10 @@
 package ru.tyurin.seausb.sync;
 
 
+import java.io.Serializable;
 import java.nio.file.attribute.FileTime;
 
-public class StorageElement {
+public class StorageElement implements Serializable {
 
 	public enum Type {
 		FILE,

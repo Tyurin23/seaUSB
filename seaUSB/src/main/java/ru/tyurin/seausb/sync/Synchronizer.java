@@ -10,31 +10,37 @@ import java.util.Set;
 import java.util.zip.CRC32;
 
 
-public class Synchronizer {
+public class Synchronizer extends Thread {
 
-	public boolean synchronize(Task task) {
-		try {
-			return synchronize(task.getSrc(), task.getDst());
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return false;
+	private Task task;
+	private FutureStatus status;
+
+	public Synchronizer(Task task) {
+		this.task = task;
+		this.status = new FutureStatus();
+	}
+
+	public FutureStatus getStatus() {
+		return status;
 	}
 
 	private boolean synchronize(final Storage src, final Storage dst) throws IOException {
 		System.out.println("Indexing...");
 		index(src);
 		index(dst);
+		status.setStatus(30);
 		System.out.println("Diffing...");
 		Set<Path> srcDiff = src.getDiff(dst);
 		Set<Path> dstDiff = dst.getDiff(src);
+		status.setStatus(60);
 		System.out.println("Copying...");
 		copy(srcDiff, src.getPath(), dst.getPath());
 		copy(dstDiff, dst.getPath(), src.getPath());
+		status.setStatus(90);
 		return isEqualsDir(src.getPath(), dst.getPath());
 	}
 
-	private void index(final Storage<StorageElement> storage) throws IOException {
+	public static void index(final Storage storage) throws IOException {
 		Files.walkFileTree(storage.getPath(), new SimpleFileVisitor<Path>() {
 			@Override
 			public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
@@ -104,15 +110,23 @@ public class Synchronizer {
 		Files.copy(from, to, StandardCopyOption.REPLACE_EXISTING);
 	}
 
-	private long getHash(Path file) throws IOException {
+	private static long getHash(Path file) throws IOException {
 		return FileUtils.checksumCRC32(file.toFile());
 	}
 
-	private long getHash(String str) {
+	private static long getHash(String str) {
 		CRC32 crc32 = new CRC32();
 		crc32.update(str.getBytes());
 		return crc32.getValue();
 	}
 
-
+	@Override
+	public void run() {
+		try {
+			synchronize(task.getSrc(), task.getDst());
+			status.setStatus(100);
+		} catch (IOException e) {
+			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+		}
+	}
 }
